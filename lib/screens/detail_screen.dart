@@ -24,6 +24,7 @@ class _DetailScreenState extends State<DetailScreen> {
   late Future<List<WebtoonEpisodeModel>> episodes;
   late SharedPreferences prefs;
   bool isLiked = false;
+  int displayedEpisodes = 10;
 
   Future initPrefs() async {
     prefs = await SharedPreferences.getInstance();
@@ -121,6 +122,7 @@ class _DetailScreenState extends State<DetailScreen> {
                   ),
                 ],
               ),
+              // 웹툰 썸네일
               const SizedBox(
                 height: 25,
               ),
@@ -140,11 +142,25 @@ class _DetailScreenState extends State<DetailScreen> {
                         const SizedBox(
                           height: 15,
                         ),
-                        Text(
-                          '${snapshot.data!.genre} | ${snapshot.data!.age}',
-                          style: const TextStyle(
-                            fontSize: 15,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '${snapshot.data!.genre} | ${snapshot.data!.age}',
+                              style: const TextStyle(
+                                fontSize: 15,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  displayedEpisodes +=
+                                      10; // 기존에 표시된 웹툰 링크 개수에 10을 더해 업데이트
+                                });
+                              },
+                              child: const Text('더 보기'),
+                            ),
+                          ],
                         ),
                       ],
                     );
@@ -152,6 +168,7 @@ class _DetailScreenState extends State<DetailScreen> {
                   return const Text('...');
                 },
               ),
+              // 웹툰 정보
               const SizedBox(
                 height: 25,
               ),
@@ -161,9 +178,10 @@ class _DetailScreenState extends State<DetailScreen> {
                   if (snapshot.hasData) {
                     return Column(
                       children: [
-                        for (var episode in snapshot.data!.length > 10
-                            ? snapshot.data!.sublist(0, 10)
-                            : snapshot.data!)
+                        for (var episode
+                            in snapshot.data!.length > displayedEpisodes
+                                ? snapshot.data!.sublist(0, displayedEpisodes)
+                                : snapshot.data!)
                           Episode(
                             episode: episode,
                             webtoonId: widget.id,
@@ -174,6 +192,7 @@ class _DetailScreenState extends State<DetailScreen> {
                   return Container();
                 },
               ),
+              // 최근 웹툰 10개 제시
             ],
           ),
         ),
